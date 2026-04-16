@@ -1,0 +1,15 @@
+{
+  "runtime": "reasoning_bank",
+  "config": {
+      "memory_path": "reasoning_bank",
+      "embedding_model": "Qwen"
+  },
+  "evaluate": {
+    "prompt": "text",
+    "log_dir": "outputs/evaluate_log"
+  },
+  "induce_memory": {
+    "criteria": "autoeval",
+    "memory_mode": "reasoningbank"
+  }
+}

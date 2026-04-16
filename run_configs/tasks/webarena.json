@@ -1,0 +1,40 @@
+{
+  "_comment": "must be included",
+  "benchmark": "webarena",
+  "driver": "browsergym",
+  "website": "shopping",
+  
+  "start_index": 0,
+  "end_index": null,
+  "prev_id": -1,
+  
+
+  "env_kwargs_json": {
+    "max_steps": 30,
+    "headless": true,
+    "slow_mo": 30,
+    "viewport": {
+      "width": 1500,
+      "height": 1280
+    }
+  },
+
+  "flag" : {
+      "comment": "the prompt template will be constructed based on the following flags, which can be customized for each task or method",
+      "use_html": false,
+      "use_ax_tree": true,
+      "use_thinking": true,
+      "use_error_logs": true,
+      "use_memory": false,
+      "use_history": true,
+      "use_diff": false,   
+      "use_past_error_logs": true, 
+      "use_action_history": true,
+      "multi_actions": true,
+      "use_abstract_example": true,
+      "use_concrete_example": true,  
+      "use_screenshot": true,
+      "enable_chat": true,
+      "demo_mode": false
+  }
+}

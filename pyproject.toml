@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "benchmark-adapter"
+version = "0.1.0"
+description = "A unified benchmark adapter layer for agent evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+benchmark-adapter = "BenchmarkAdapter.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["BenchmarkAdapter*", "agent*", "benchmark*", "methods*"]
