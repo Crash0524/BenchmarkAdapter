@@ -124,7 +124,7 @@ class WebArenaAdapter(BenchmarkAdapter):
                     use_screenshot=flags_cfg.get("use_screenshot", True),
                     enable_chat=True,
                     demo_mode="default" if flags_cfg.get("demo_mode", False) else "off",
-                    memory_path=flags_cfg.get("memory_path", None),
+                    memory_path=memory_path,
                     ),
             ),
         )

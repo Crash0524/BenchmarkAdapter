@@ -159,29 +159,24 @@ class GEMINI_Client:
 class QWEN_Client:
     def __init__(self, model_name: str = "qwen3.5-flash") -> None:
         self.model_name = model_name
-        # 初始化阿里百炼客户端
         self.client = OpenAI(
             api_key=os.getenv("DASHSCOPE_API_KEY"),
             base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
 
     def chat(self, messages, json_mode: bool = False, temperature: float = 0.0) -> tuple[str, any]:
-        """
-        与 GEMINI_Client 格式对齐，接收消息列表，返回 (响应文本, 原始对象)
-        """
-        # 调用 Qwen API 并开启深度思考
+
+
         chat_completion = self.client.chat.completions.create(
             model=self.model_name,
-            messacges=messages,
+            messages=messages,
             temperature=temperature,
             extra_body={"enable_thinking": True}
         )
 
         response_text = chat_completion.choices[0].message.content
-        # 提取深度思考内容 (reasoning_content)
         reasoning = getattr(chat_completion.choices[0].message, "reasoning_content", "")
 
-        # 为了让后续的评估逻辑能读到思考过程，我们将思考内容包装在 <think> 标签内
         if reasoning:
             response_text = f"<think>\n{reasoning}\n</think>\n{response_text}"
 
@@ -199,27 +194,19 @@ class QWEN_Client:
 
 class LOCAL_Client:
     def __init__(self, model_name: str = "/mnt/data/workspace/chuntingmen/model/Qwen3.5-9B") -> None:
-        """
-        model_name 必须与 vllm 启动时的 --model 参数或 --served-model-name 一致
-        """
+
         self.model_name = "/mnt/data/workspace/chuntingmen/model/Qwen3.5-9B"
-        # 初始化本地 vLLM 客户端
         self.client = OpenAI(
-            api_key="EMPTY", # vLLM 本地调用不需要 API Key
+            api_key="EMPTY",
             base_url="http://localhost:8000/v1"
         )
 
     def chat(self, messages, json_mode: bool = False, temperature: float = 0.0) -> tuple[str, any]:
-        """
-        与 QWEN_Client 格式对齐，接收消息列表，返回 (响应文本, 原始对象)
-        """
-        # 注意：本地 vLLM 默认通常不需要 extra_body={"enable_thinking": True}
-        # 因为你启动时带了 --reasoning-parser qwen3，它会自动解析思考过程
+
         chat_completion = self.client.chat.completions.create(
             model=self.model_name,
             messages=messages,
             temperature=temperature,
-            # 如果是 json 模式，vLLM 支持直接传 response_format
             response_format={"type": "json_object"} if json_mode else None,
             timeout = 180
         )
@@ -227,11 +214,7 @@ class LOCAL_Client:
         message_obj = chat_completion.choices[0].message
         response_text = message_obj.content
         
-        # 提取本地 vLLM 解析出的深度思考内容 (reasoning_content)
-        # 启动参数 --reasoning-parser qwen3 会将思考内容放入这个字段
         reasoning = getattr(message_obj, "reasoning_content", "")
-
-        # 格式对齐：将思考内容包装在 <think> 标签内
         if reasoning:
             response_text = f"<think>\n{reasoning}\n</think>\n{response_text}"
 

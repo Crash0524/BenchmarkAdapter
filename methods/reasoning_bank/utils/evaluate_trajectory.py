@@ -137,13 +137,10 @@ def evaluate_trajectory(
         evaluate_cfg["model"] = default_model
 
     result_dir_path = Path(result_dir)
-    task_name = result_dir_path.name.split("//")[-1]21354916
+    task_name = str(result_dir_path).split("/")[-1]
     task_id = task_name.split(".")[-1]
 
-    print(evaluate_cfg)
-    print(result_dir_path)
-
-    model = str(evaluate_cfg.get("model") or default_model)
+    model = str(evaluate_cfg.get("model"))
     prompt = str(evaluate_cfg.get("prompt", "text"))
     if prompt not in {"text", "vision"}:
         raise ValueError("evaluate.prompt must be 'text' or 'vision'")

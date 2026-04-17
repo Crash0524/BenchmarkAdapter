@@ -41,8 +41,8 @@ def build_system_prompt(flags: Any, dynamic_prompt: str | None = None) -> str:
         return sys_msg + "\n\n" + dynamic_prompt
 
     memory_path = getattr(flags, "memory_path", None)
-    if isinstance(memory_path, str) and memory_path.strip():
-        memory_text = _read_text_file(memory_path)
+    if isinstance(memory_path, (str, Path)) and str(memory_path).strip():
+        memory_text = _read_text_file(str(memory_path))
         if memory_text:
             sys_msg += (
                 "\n\nBelow are some memory items that I accumulated from past interaction from "
@@ -51,7 +51,6 @@ def build_system_prompt(flags: Any, dynamic_prompt: str | None = None) -> str:
                 "use each memory item or not, and then take action."
             )
             sys_msg += "\n\n" + memory_text
-
     return sys_msg
 
 
