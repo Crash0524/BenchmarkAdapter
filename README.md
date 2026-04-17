@@ -234,7 +234,7 @@ If you plan to open-source this repository:
 
 ## License
 
-See the repository license if one is provided by the upstream project or the surrounding workspace.
+Licensed under the Apache License, Version 2.0. See LICENSE.
 
 ## Acknowledgements
 
