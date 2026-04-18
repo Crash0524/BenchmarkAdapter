@@ -1,6 +1,6 @@
 # BenchmarkAdapter
 
-BenchmarkAdapter is a lightweight adapter layer for running web agents across benchmarks, methods, and API backends with a single execution entrypoint.
+Agent Benchmark Adapter is a lightweight adapter layer for running web agents across benchmarks, methods, and API backends with a single execution entrypoint.
 
 It is designed around three ideas:
 
