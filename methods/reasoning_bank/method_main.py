@@ -193,6 +193,7 @@ def run(
 
             eval_output = evaluate_trajectory(
                 method_cfg=method_cfg,
+                task_cfg=task_cfg,
                 result_dir=task_out_dir,
                 default_model=str(method_config.get("model_name", api_name)),
             )
@@ -202,6 +203,7 @@ def run(
             if isinstance(induce_cfg, Mapping):
                 memory_output = induce_memory(
                     method_cfg=method_cfg,
+                    task_cfg=task_cfg,
                     result_dir=task_out_dir,
                     task_name=name,
                     default_model=str(method_config.get("model_name", api_name)),

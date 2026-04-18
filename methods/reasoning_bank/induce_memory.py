@@ -124,12 +124,12 @@ def format_examples(examples: list[dict], flag=False) -> str:
         return '\n\n'.join(["## Query and Trajectory Generated Using Previous Memory"] + formatted_examples + ["## Correctness Signal"]+ ["The result is INCORRECT."] + ["## Updated Memory"])
 
 
-def get_info(result_dir: str | Path, status: str) -> dict[str, Any]:
+def get_info(result_dir: str | Path, status: str, data_dir: str | Path) -> dict[str, Any]:
     result_dir = str(result_dir)
         
     # get query -> task objective
     task_id = result_dir.split('/')[-1].split("_")[0].split(".")[1]
-    config_path = os.path.join("config_files", f"{task_id}.json")
+    config_path = os.path.join(str(data_dir), f"{task_id}.json")
     config = json.load(open(config_path))
     query = config["intent"]
 
@@ -152,6 +152,7 @@ def get_info(result_dir: str | Path, status: str) -> dict[str, Any]:
 
 def induce_memory(
     method_cfg: Mapping[str, Any],
+    task_cfg: Mapping[str, Any],
     result_dir: str | Path,
     task_name: str,
     default_model: str,
@@ -178,7 +179,7 @@ def induce_memory(
 
     status = "success" if reward > 0 else "fail"
 
-    ex = get_info(result_dir=result_dir_path, status=status)
+    ex = get_info(result_dir=result_dir_path, status=status, data_dir=task_cfg.get("config_dir", "config_files"))
 
     # Define the LLM client based on the model choice
     llm_client = CLIENT_DICT[model](model_name=model)

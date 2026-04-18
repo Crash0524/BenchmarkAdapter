@@ -125,6 +125,7 @@ def process_sample(
 
 def evaluate_trajectory(
     method_cfg: Mapping[str, Any],
+    task_cfg: Mapping[str, Any],
     result_dir: str | Path,
     default_model: str,
 ) -> Path:
@@ -150,7 +151,7 @@ def evaluate_trajectory(
 
     log_dir = Path(str(evaluate_cfg.get("log_dir", "outputs/evaluate_log")))
 
-    config_path = Path("config_files") / f"{task_id}.json"
+    config_path = Path(str(task_cfg.get("config_dir", "config_files"))) / f"{task_id}.json"
     config = json.load(open(config_path))
 
     # load trajectory log (prefer merged run.log, fallback to experiment.log)

@@ -3,6 +3,7 @@
   "benchmark": "webarena",
   "driver": "browsergym",
   "website": "shopping",
+  "config_dir": "data/WebArena/config_files",
   
   "start_index": 0,
   "end_index": null,
