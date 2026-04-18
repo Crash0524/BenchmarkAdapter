@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
-benchmark-adapter = "BenchmarkAdapter.cli:main"
+benchmark-adapter = "run_pipeline:main"
 
 [tool.setuptools.packages.find]
 include = ["BenchmarkAdapter*", "agent*", "benchmark*", "methods*"]

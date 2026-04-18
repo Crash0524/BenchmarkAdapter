@@ -2,29 +2,21 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-
-from BenchmarkAdapter.adapters.base import RunObject
 from BenchmarkAdapter.adapters.base import BenchmarkAdapter, BenchmarkTaskSelector
-from benchmark.WebArena.adapter import WebArenaAdapter, WebArenaTaskSelector
+from BenchmarkAdapter.registry import build_adapter as _build_adapter
+from BenchmarkAdapter.registry import build_task_selector as _build_task_selector
 
 
 def build_task_selector(
     benchmark: str,
     task_cfg: Mapping[str, Any],
 ) -> BenchmarkTaskSelector:
-    if benchmark == "webarena":
-        return WebArenaTaskSelector(task_cfg)
-    raise ValueError(f"Unsupported benchmark for task selection: {benchmark}")
+    return _build_task_selector(benchmark, dict(task_cfg))
 
 
 def adapter_selector(
     benchmark: str,
     task_cfg: Mapping[str, Any],
 ) -> BenchmarkAdapter:
-    """
-    select adapter and env for task
-    """
-    if benchmark == "webarena":
-        config: dict[str, Any] = dict(task_cfg)
-        return WebArenaAdapter(config)
-    raise ValueError(f"Unsupported benchmark for adapter selection: {benchmark}")
+    """Build the configured benchmark adapter."""
+    return _build_adapter(benchmark, dict(task_cfg))

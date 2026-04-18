@@ -19,7 +19,7 @@
     }
   },
 
-  "flag" : {
+  "flags" : {
       "comment": "the prompt template will be constructed based on the following flags, which can be customized for each task or method",
       "use_html": false,
       "use_ax_tree": true,
