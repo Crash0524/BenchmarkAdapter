@@ -8,8 +8,6 @@ from logging import FileHandler
 from pathlib import Path
 from typing import Any, Mapping
 
-from BenchmarkAdapter.drivers.registry import get_driver_cls
-from BenchmarkAdapter.registry import get_adapter_cls
 from BenchmarkAdapter.adapters.base import RunObject
 from benchmark.utils.utils import build_task_selector, adapter_selector
 from .induce_memory import induce_memory
@@ -63,7 +61,9 @@ def _prepare_memory_for_run(
     output_dir: Path,
     logger: logging.Logger,
 ) -> Path:
-    config_cfg = method_cfg.get("config")
+    config_cfg = method_cfg.get("config", {})
+    if not isinstance(config_cfg, Mapping):
+        raise TypeError("method_cfg.config must be a mapping")
 
     memory_path_raw = config_cfg.get("memory_path", "reasoning_bank")
     memory_dir = Path(output_dir) / str(memory_path_raw)

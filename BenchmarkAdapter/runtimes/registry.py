@@ -3,15 +3,11 @@ from __future__ import annotations
 from typing import Type
 
 from .base import BaseRuntime
-from methods.agent_api import AgentAPIRuntime
 from methods.echo import EchoRuntime
-from methods.reasoning_bank import ReasoningBankRuntime
 
 
 RUNTIME_REGISTRY: dict[str, Type[BaseRuntime]] = {
     "echo": EchoRuntime,
-    "agent-api": AgentAPIRuntime,
-    "reasoning_bank": ReasoningBankRuntime,
 }
 
 

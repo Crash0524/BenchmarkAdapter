@@ -1,1 +1,1 @@
-from .adapter import WebArenaAdapter
+from .adapter import WebArenaAdapter, WebArenaTaskSelector

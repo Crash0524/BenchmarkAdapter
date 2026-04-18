@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from BenchmarkAdapter.adapters.base import BenchmarkAdapter
@@ -9,7 +10,7 @@ from BenchmarkAdapter.base import BenchmarkInstance
 class BrowserGymDriver:
     """Environment driver for BrowserGym tasks via gymnasium.
 
-    Expected configuration via ``adapter.config.extra``:
+    Expected configuration via ``adapter.config["extra"]``:
     - ``browsergym_task``: str, required if not present in instance
     - ``browsergym_env_kwargs``: dict, optional kwargs passed to ``gym.make``
     - ``seed``: int, optional reset seed
@@ -23,7 +24,9 @@ class BrowserGymDriver:
                 "BrowserGymDriver requires gymnasium. Install it before using this driver."
             ) from exc
 
-        extra = adapter.config.extra or {}
+        config = adapter.config if isinstance(adapter.config, Mapping) else {}
+        raw_extra = config.get("extra", {})
+        extra = dict(raw_extra) if isinstance(raw_extra, Mapping) else {}
         task_name = (
             instance.metadata.get("browsergym_task")
             or instance.raw.get("browsergym_task")
@@ -34,7 +37,7 @@ class BrowserGymDriver:
             raise ValueError(
                 "BrowserGymDriver requires task name in one of: "
                 "instance.metadata['browsergym_task'], instance.raw['browsergym_task'], "
-                "config.extra['browsergym_task'], or config.extra['task_name']."
+                "config['extra']['browsergym_task'], or config['extra']['task_name']."
             )
 
         if str(task_name).startswith("webarena"):
@@ -50,7 +53,7 @@ class BrowserGymDriver:
             env_kwargs.update(instance_env_kwargs)
         env = gym.make(task_name, **env_kwargs)
 
-        seed = extra.get("seed", adapter.config.seed)
+        seed = extra.get("seed", config.get("seed"))
         try:
             env.reset(seed=seed)
         except TypeError:

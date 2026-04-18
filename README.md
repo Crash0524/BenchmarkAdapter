@@ -6,7 +6,7 @@ It is designed around three ideas:
 
 - benchmark-specific logic lives in `benchmark/`
 - method-specific logic lives in `methods/`
-- shared execution and dispatch logic lives in `BenchmarkAdapter/` and `run_pipeline.py`
+- shared contracts and dispatch logic live in `BenchmarkAdapter/` and `run_pipeline.py`
 
 The current repository focus is a WebArena benchmark integration with the `reasoning_bank` method.
 
@@ -26,9 +26,9 @@ This repository is structured so that you can add new benchmarks or methods with
 ## Repository Layout
 
 - `BenchmarkAdapter/`
-  - core adapter contracts
-  - registry and dispatch helpers
-  - runtime/driver abstractions
+  - core benchmark contracts
+  - benchmark registry and dispatch helpers
+  - optional runtime/driver abstractions
 - `benchmark/`
   - benchmark-specific adapters
   - WebArena prompt and agent integration
@@ -155,7 +155,6 @@ Example: `run_configs/tasks/webarena.json`
 Important fields:
 
 - `benchmark`: benchmark selector used by the task dispatcher
-- `driver`: environment driver name
 - `website`: WebArena site group to run
 - `start_index`: first selected task index
 - `end_index`: optional end index
@@ -164,8 +163,8 @@ Important fields:
 - `flags`: prompt and observation flags used by the WebArena adapter
 
 Note:
-- The code currently reads the key `flags` in the WebArena adapter.
-- If your task JSON still uses `flag`, rename it to `flags` to match the implementation.
+- The adapter prefers `flags`.
+- Legacy task JSON using `flag` is still accepted for backward compatibility.
 
 ### Method configuration
 
@@ -218,7 +217,7 @@ This file defines model-related defaults such as:
 
 1. Create a new adapter package under `benchmark/`.
 2. Implement the benchmark adapter and task selector.
-3. Register the benchmark in `benchmark/utils/utils.py`.
+3. Register the benchmark in `BenchmarkAdapter/registry.py`.
 4. Add a task config in `run_configs/tasks/`.
 5. Add any required environment or prompt helpers.
 

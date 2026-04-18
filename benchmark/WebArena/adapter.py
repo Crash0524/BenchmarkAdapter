@@ -20,8 +20,20 @@ class WebArenaAdapter(BenchmarkAdapter):
         super().__init__(config)
 
         env_kwargs = config.get("env_kwargs_json")
-        assert env_kwargs is None or isinstance(env_kwargs, Mapping)
-        self.env_kwargs_json = dict(env_kwargs)
+        if env_kwargs is not None and not isinstance(env_kwargs, Mapping):
+            raise TypeError("env_kwargs_json must be a mapping when provided")
+        self.env_kwargs_json = dict(env_kwargs or {})
+
+    def _get_flags_config(self) -> Mapping[str, Any]:
+        flags_cfg = self.config.get("flags")
+        if isinstance(flags_cfg, Mapping):
+            return flags_cfg
+
+        legacy_flags_cfg = self.config.get("flag")
+        if isinstance(legacy_flags_cfg, Mapping):
+            return legacy_flags_cfg
+
+        return {}
 
     def load_instances(self) -> Iterable[Mapping[str, Any]]:
         instances = self.config.get("instances", [])
@@ -92,17 +104,18 @@ class WebArenaAdapter(BenchmarkAdapter):
         viewport = self.env_kwargs_json.get("viewport")
         if viewport is not None and not isinstance(viewport, Mapping):
             raise TypeError("env_kwargs_json.viewport must be a mapping when provided")
+        viewport_cfg = dict(viewport) if viewport is not None else None
 
         env_args = EnvArgs(
             task_name=str(task_name),
             task_seed=None,
             max_steps=int(self.env_kwargs_json.get("max_steps", 30)),
             headless=bool(self.env_kwargs_json.get("headless", True)),
-            viewport=dict(viewport),
+            viewport=viewport_cfg,
             slow_mo=int(self.env_kwargs_json.get("slow_mo", 0)),
         )
 
-        flags_cfg = self.config.get("flags", {})
+        flags_cfg = self._get_flags_config()
 
         exp_args = ExpArgs(
             env_args=env_args,
@@ -128,7 +141,9 @@ class WebArenaAdapter(BenchmarkAdapter):
                     ),
             ),
         )
-        out_dir = Path(output_dir) if output_dir is not None else self.default_output_dir
+        if output_dir is None:
+            raise ValueError("output_dir is required for WebArenaAdapter.run(...)")
+        out_dir = Path(output_dir)
 
         exp_args.prepare(out_dir)
         exp_args.run()

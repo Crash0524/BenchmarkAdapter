@@ -2,17 +2,22 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from ..base import BenchmarkInstance, BenchmarkResult, Trajectory
 
 
 class BenchmarkAdapter(ABC):
-    """Abstract interface for benchmark-specific adapters.
+    """Abstract interface for benchmark-specific integrations.
 
-    Implementations should only override benchmark-specific behavior:
-    loading instances, extracting task text, building environments, and
-    judging results. The shared runner can call these methods uniformly.
+    The repository currently supports two execution styles:
+    1. benchmark-native execution via ``run(...)`` on one ``RunObject``;
+    2. generic execution via ``iter_instances()`` for the shared runner.
+
+    WebArena uses the benchmark-native path today. Future benchmarks such as
+    Mind2Web should implement the smallest surface they actually need instead
+    of inheriting assumptions from a different execution model.
     """
 
     def __init__(self, config: Mapping[str, Any]) -> None:
@@ -26,12 +31,10 @@ class BenchmarkAdapter(ABC):
     @abstractmethod
     def normalize_instance(self, instance: Mapping[str, Any]) -> BenchmarkInstance:
         """Convert a raw instance into the canonical representation."""
-        pass
 
     @abstractmethod
     def build_environment(self, instance: BenchmarkInstance) -> Any:
         """Create the environment used to run the agent for one instance."""
-        pass
 
     def build_context(self, instance: BenchmarkInstance, env: Any) -> dict[str, Any]:
         """Optional context builder consumed by the agent."""
@@ -40,7 +43,6 @@ class BenchmarkAdapter(ABC):
     @abstractmethod
     def judge(self, instance: BenchmarkInstance, trajectory: Trajectory) -> BenchmarkResult:
         """Evaluate one trajectory and return a canonical result."""
-        pass
 
     def before_run(self) -> None:
         """Optional hook invoked once before iterating over instances."""
@@ -59,9 +61,27 @@ class BenchmarkAdapter(ABC):
         for instance in self.load_instances():
             yield self.normalize_instance(instance)
 
+    def run(
+        self,
+        run_object: "RunObject",
+        chat_model_args: Any | None = None,
+        memory_path: str | Path | None = None,
+        output_dir: str | Path | None = None,
+    ) -> Path:
+        """Execute one benchmark-specific run object.
+
+        Adapters should override this when the benchmark has a native execution
+        stack that is more appropriate than the shared generic runner.
+        """
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not implement benchmark-native run(...)"
+        )
+
 
 class BenchmarkTaskSelector(ABC):
-    def __init__(self, task_cfg: Mapping[str, Any], method_cfg: Mapping[str, Any] | None = None) -> None:
+    """Select benchmark-specific run objects from task configuration."""
+
+    def __init__(self, task_cfg: Mapping[str, Any]) -> None:
         self.task_cfg = task_cfg
 
     @abstractmethod
@@ -71,12 +91,12 @@ class BenchmarkTaskSelector(ABC):
 
 @dataclass(frozen=True)
 class RunObject:
-    name: str  # task name expmple: "webarena.1"
+    """Canonical task unit emitted by a benchmark task selector."""
+
+    name: str
     cli_args: dict[str, Any]
     instances: dict[str, Any]
     task_description: str | None = None
     output_stem: str | None = None
     tags: dict[str, str] = field(default_factory=dict)
-
-
 
